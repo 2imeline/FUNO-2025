@@ -41,7 +41,6 @@ public class helper : NetworkBehaviour
     [ObserversRpc]
     public void moveObject(NetworkObject obj, Vector3 where, bool local = true)
     {
-        Debug.Log("move card");
         if(local)
             obj.transform.localPosition = where;
         else
@@ -51,7 +50,6 @@ public class helper : NetworkBehaviour
     [ObserversRpc]
     public void setRotation(NetworkObject obj, Quaternion rot, bool local = true)
     {
-        Debug.Log("rotate card");
         if(local)
             obj.transform.localRotation = rot;
         else

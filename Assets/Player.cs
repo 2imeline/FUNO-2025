@@ -51,7 +51,7 @@ bool imReady = false;
     {
         base.OnStartClient();
 
-        Application.targetFrameRate = 165;
+        Application.targetFrameRate = 60;
 
         myTurnIndicator.SetActive(false);
         cameraLogic = GetComponent<LookAround>();
@@ -146,21 +146,30 @@ bool imReady = false;
         TurnManager.Instance.moveTurn();
     }
 
+
     [ObserversRpc]
     public void centerCards(NetworkObject cardToPlay)
     {
+        Debug.Log("attempting to center cards");
         for (int i = 0; i < hand.Count; i++)
         {
             int indexPlayed = hand.IndexOf(cardToPlay.transform);
+            Debug.Log($"On card {i} in hand");
+            Debug.Log($"Index played was card {indexPlayed} in hand");
             float deltaX = 0;
             //do i move left first?
             if(i >= indexPlayed)
+            {
                 deltaX -= cardHandSpacing;
+                Debug.Log("Move left first");
+            }
+
 
             deltaX += (cardHandSpacing/2);
 
             float targetX = deltaX + hand[i].localPosition.x;
 
+            Debug.Log($"Calculated targetX is {targetX}");
             hand[i].DOLocalMoveX(targetX, 0.15f);
         
         }
@@ -174,8 +183,8 @@ bool imReady = false;
         Card lastPlayed = DeckManager.Instance.lastPlayedCard;
         if((card.myNumber == lastPlayed.myNumber || card.myColor == lastPlayed.myColor))
         {
-            playCard(cardToPlay);
             centerCards(cardToPlay);
+            playCard(cardToPlay);
             TurnManager.Instance.moveTurn();
         }
 

@@ -70,7 +70,6 @@ float lastX = 0;
     [ObserversRpc]
     public void putToDiscard(NetworkObject card)
     {
-        Debug.Log($"btw im discarding {card.GetComponent<Card>().myNumber}");
         parentCard(card, discardPile.GetComponent<NetworkObject>());
         helper.Instance.moveObject(card, new Vector3(0, numPlayed*heightIncrease, 0));
         helper.Instance.setRotation(card, Quaternion.Euler(90, 0, 0));
@@ -134,7 +133,6 @@ float lastX = 0;
     public void shuffle()
     {
 
-        Debug.Log("shuffle started");
         // Fisher–Yates Shuffle
         for (int i = 0; i < cards.Count; i++)
         {
@@ -158,12 +156,9 @@ float lastX = 0;
     [ObserversRpc]
     public void syncCardPositions(List<int> idList, int truCount, int zInum)
     {
-        Debug.Log("I Ran!!");
         List<Transform> tempCards = new List<Transform>(cards);
         cards.Clear();
 
-        Debug.Log($"IDList count is {idList.Count}");
-        Debug.Log($"Intended IDList count is {truCount}");
         for (int i = 0; i < idList.Count; i++)
         {
             for (int k = 0; k < tempCards.Count; k++)
@@ -182,8 +177,6 @@ float lastX = 0;
             Transform currentCard = cards[i];
             currentCard.localPosition = new Vector3(xIncrease*i, heightIncrease*i, 0);
         }
-        Debug.Log($"My card 0 num is {cards[0].GetComponent<Card>().myNumber}");
-        Debug.Log($"Intended card 0 num is {zInum}");
         GameManager.Instance.notifyServerReadyForDeal();
     }
 
@@ -192,10 +185,8 @@ float lastX = 0;
     public IEnumerator handOutCards(List<Player> players)
     {
         yield return new WaitForSeconds(1);
-        Debug.Log("hey handing out now!");
         foreach (Player player in players)
         {
-            Debug.Log("A PLAYER!");
             for (int i = 0; i < cardsPerPlayer; i++)
             {
                 NetworkObject cardNOB = cards[0].GetComponent<NetworkObject>();
@@ -210,7 +201,7 @@ float lastX = 0;
                 if(i == 0)
                     helper.Instance.moveObject(cardNOB, Vector3.zero);
                 helper.Instance.setRotation(cardNOB, quaternion.identity);
-                doHandStuff(player, 1);
+                doHandStuff(player, 1, cardNOB);
                 cards.RemoveAt(0);
             }
             doHandStuff(player, 2);
@@ -219,12 +210,12 @@ float lastX = 0;
     }
 
     [ObserversRpc]
-    public void doHandStuff(Player player, int stuffDoing)
+    public void doHandStuff(Player player, int stuffDoing, NetworkObject cardToGive = null)
     {
         switch (stuffDoing)
         {
             case 1:
-                player.hand.Add(cards[0]);
+                player.hand.Add(cardToGive.transform);
                 cards.RemoveAt(0);
                 break;
             case 2:
@@ -235,7 +226,6 @@ float lastX = 0;
     [ObserversRpc]
     public void parentCard(NetworkObject card, NetworkObject parent)
     {
-        Debug.Log("Card parented");
         card.transform.parent = parent.transform;
     }
 
