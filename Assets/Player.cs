@@ -63,6 +63,7 @@ bool imReady = false;
             cameraLogic.cameraTransform.gameObject.SetActive(false);
             cameraLogic.enabled = false;
             this.enabled = false;
+            Destroy(myTurnIndicator);
         }
         
             string name = GameObject.Find("UsernameManager").GetComponent<UsernameManager>().username;

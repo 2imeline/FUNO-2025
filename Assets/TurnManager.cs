@@ -31,7 +31,8 @@ public class TurnManager : NetworkBehaviour
         foreach (Player player in _players)
         {
             player.myTurn = false;
-            player.myTurnIndicator.SetActive(false);
+            if(player.myTurnIndicator != null)
+                player.myTurnIndicator.SetActive(false);
         }
         _players[turnIndex].myTurnIndicator.SetActive(true);
         _players[turnIndex].myTurn = true;
