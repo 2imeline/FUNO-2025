@@ -6,6 +6,7 @@ using DG.Tweening;
 using System.Linq;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 
 public class Player : NetworkBehaviour
@@ -86,8 +87,9 @@ bool imReady = false;
         if(Input.GetKeyDown(KeyCode.C))
             levitationController();
 
-        if(Input.GetKeyDown(KeyCode.P))
-            pickUpCard();
+        if(Input.GetKeyDown(KeyCode.P) && myTurn)
+            requestDrawCard();
+
 
         RaycastHit hit;
         if(Physics.Raycast(cameraLogic.cameraTransform.position, cameraLogic.cameraTransform.forward, out hit, 5))
@@ -139,50 +141,60 @@ bool imReady = false;
         nob.transform.DOKill();
     }
 
-    //needs MP rework, probably broken
-    void pickUpCard()
+    [ServerRpc]
+    public void requestDrawCard()
     {
-        DeckManager.Instance.drawCard(this);
-        centerCards(hand.First().GetComponent<NetworkObject>());
-        TurnManager.Instance.moveTurn();
+        DeckManager.Instance.drawCard(GetComponent<NetworkObject>());
+        
+    }
+
+    [ObserversRpc]
+    public void runDrawOperations()
+    {
+        centerCards(hand.Last().GetComponent<NetworkObject>(), false);
+        if(!canIPlay(hand.Last().GetComponent<Card>()))
+            TurnManager.Instance.moveTurn();
     }
 
 
     [ObserversRpc]
-    public void centerCards(NetworkObject cardToPlay)
+    public void centerCards(NetworkObject cardToPlay, bool playing = true)
     {
-        Debug.Log("attempting to center cards");
         for (int i = 0; i < hand.Count; i++)
         {
             int indexPlayed = hand.IndexOf(cardToPlay.transform);
-            Debug.Log($"On card {i} in hand");
-            Debug.Log($"Index played was card {indexPlayed} in hand");
             float deltaX = 0;
             //do i move left first?
-            if(i >= indexPlayed)
+            if(i >= indexPlayed && playing)
             {
                 deltaX -= cardHandSpacing;
-                Debug.Log("Move left first");
             }
 
-
-            deltaX += (cardHandSpacing/2);
+            if(playing)
+                deltaX += (cardHandSpacing/2);
+            else
+                deltaX -= (cardHandSpacing/2);
 
             float targetX = deltaX + hand[i].localPosition.x;
 
-            Debug.Log($"Calculated targetX is {targetX}");
             hand[i].DOLocalMoveX(targetX, 0.15f);
         
         }
     }
 
+    public bool canIPlay(Card cardToPlay)
+    {
+        if((cardToPlay.myNumber == DeckManager.Instance.lastPlayedCard.myNumber || cardToPlay.myColor == DeckManager.Instance.lastPlayedCard.myColor))
+            return true;
+        return false;
+    }
 
     [ServerRpc]
     public void attemptPlay(NetworkObject cardToPlay)
     {
         Card card = cardToPlay.GetComponent<Card>();
         Card lastPlayed = DeckManager.Instance.lastPlayedCard;
-        if((card.myNumber == lastPlayed.myNumber || card.myColor == lastPlayed.myColor))
+        if(canIPlay(card))
         {
             centerCards(cardToPlay);
             playCard(cardToPlay);

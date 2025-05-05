@@ -67,7 +67,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 65
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -798,6 +798,7 @@ MonoBehaviour:
   myTurnIndicator: {fileID: 5657382480361768559}
   myTurn: 0
   cheats: 0
+  cardsLevitating: 0
   hand: []
   lastLookedCard: {fileID: 0}
 --- !u!114 &9201553167006831305

@@ -239,13 +239,44 @@ float lastX = 0;
     }
 
 
-    public void drawCard(Player playerRequested)
+
+
+    [Server]
+    public void drawCard(NetworkObject playerNOB)
     {
-        cards[0].transform.parent = playerRequested.cardHolder;
-        cards[0].localPosition = new Vector3(playerRequested.hand.Last().localPosition.x+cardHandSpacing, 0, -0.001114903f*playerRequested.hand.Count);
-        playerRequested.hand.Add(cards[0]);
-        cards[0].localRotation = Quaternion.identity;
-        cards.RemoveAt(0);
+        Player player = playerNOB.GetComponent<Player>();
+        //tru index of card 
+        float tI = 0;
+        if(player.hand.Count % 2 == 0)
+            tI+=0.5f;
+        foreach (Transform card in player.hand)
+        {
+            if(card.localPosition.x >= 0)
+            {
+                Debug.Log($"positive card found: {card.GetComponent<Card>().myNumber}");
+                tI++;
+            }
+        }
+        Debug.Log($"tI = {tI}");
+        NetworkObject cardDrawn = cards[0].GetComponent<NetworkObject>();
+        parentCard(cardDrawn, player.cardHolder.GetComponent<NetworkObject>());
+        Vector3 moveLocation = new Vector3(tI*cardHandSpacing, 0, -0.001114903f*player.hand.Count);
+        Debug.Log($"intended X for new card: {tI*cardHandSpacing}");
+        helper.Instance.moveObject(cardDrawn, moveLocation);
+        helper.Instance.setRotation(cardDrawn, Quaternion.identity);
+        drawClientStuff(playerNOB, cardDrawn);
+        player.runDrawOperations();
+
     }
+
+    [ObserversRpc]
+    public void drawClientStuff(NetworkObject playerNOB, NetworkObject cardDrawn)
+    {
+        Player player = playerNOB.GetComponent<Player>();
+        cards.RemoveAt(0);
+        player.hand.Add(cardDrawn.transform);
+
+    }
+
 
 }
