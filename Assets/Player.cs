@@ -206,7 +206,8 @@ bool imReady = false;
         if(cardsLevitating)
         {
             helper.Instance.requestSetParent(cardHolder.GetComponent<NetworkObject>(), this.NetworkObject);
-            requestTweenY(lastLookedCard.transform.GetComponent<NetworkObject>(), 0, 0.15f);
+            if(lastLookedCard != null)
+                requestTweenY(lastLookedCard.transform.GetComponent<NetworkObject>(), 0, 0.15f);
         }
         else
             helper.Instance.requestSetParent(cardHolder.GetComponent<NetworkObject>());
