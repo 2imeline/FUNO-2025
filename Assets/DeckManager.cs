@@ -98,6 +98,19 @@ float lastX = 0;
                 spawnCard(n, s);
                 spawnCard(n, s);
             }
+            spawnCard(10, s);
+            spawnCard(11, s);
+            spawnCard(12, s);
+            
+            spawnCard(10, s);
+            spawnCard(11, s);
+            spawnCard(12, s);
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            spawnCard(13, 0);
+            spawnCard(14, 0);
+            
         }
         yield return new WaitForSeconds(1);
         shuffle();
@@ -108,7 +121,21 @@ float lastX = 0;
     {
         Card newCard = Instantiate(cardPrefab).GetComponent<Card>();
         Spawn(newCard.gameObject);
-        generateCard(num, suit, newCard);
+        switch (num)
+        {
+            case 10:
+            case 11:
+            case 12:
+                generateSpecial(num, suit, newCard);
+                break;
+            case 13:
+            case 14:
+                generateWild(num, newCard);
+                break;
+            default:
+                generateCard(num, suit, newCard);
+                break;
+        }
     }
     [ObserversRpc]
     public void generateCard(int num, int suit, Card newCard)
@@ -124,6 +151,69 @@ float lastX = 0;
         lastX += xIncrease;
         newCard.cardText.text = $"{num}";
         newCard.name = $"{num}";
+        cards.Add(newCard.transform);
+    }
+    [ObserversRpc]
+    public void generateSpecial(int num, int suit, Card newCard)
+    {
+        newCard.transform.parent = deck;
+        newCard.transform.position = Vector3.zero;
+        newCard.transform.rotation = Quaternion.Euler(90, 0, 0);
+        newCard.myNumber = num;
+        newCard.GetComponentInChildren<MeshRenderer>().material.color = suitColorList[suit];
+        newCard.myColor = suitColorList[suit];
+        newCard.transform.localPosition = new Vector3(lastX+xIncrease, lastHeight+heightIncrease, 0);
+        lastHeight += heightIncrease;
+        lastX += xIncrease;
+        string cardText = "temp";
+        switch (num)
+        {
+            //skip
+            case 10:
+                cardText = "S";
+                break;
+            //reverse
+            case 11:
+                cardText = "R";
+                break;
+            //+2
+            case 12:
+                cardText = "+";
+                break;
+        }
+        newCard.cardText.text = cardText;
+        newCard.name = cardText;
+        newCard.special = true;
+        cards.Add(newCard.transform);
+    }
+    [ObserversRpc]
+    public void generateWild(int num, Card newCard)
+    {
+        newCard.transform.parent = deck;
+        newCard.transform.position = Vector3.zero;
+        newCard.transform.rotation = Quaternion.Euler(90, 0, 0);
+        newCard.myNumber = num;
+        newCard.GetComponentInChildren<MeshRenderer>().material.color = Color.black;
+        newCard.myColor = Color.black;
+        newCard.transform.localPosition = new Vector3(lastX+xIncrease, lastHeight+heightIncrease, 0);
+        lastHeight += heightIncrease;
+        lastX += xIncrease;
+        string cardText = "temp";
+        switch (num)
+        {
+            //Wild
+            case 13:
+                cardText = "W";
+                break;
+            //+4
+            case 14:
+                cardText = "+";
+                break;
+        }
+        newCard.cardText.text = cardText;
+        newCard.cardText.color = Color.white;
+        newCard.name = cardText;
+        newCard.wild = true;
         cards.Add(newCard.transform);
     }
     
@@ -235,7 +325,7 @@ float lastX = 0;
         helper.Instance.logToEveryone("i am being run on server");
         Card firstCard = cards[UnityEngine.Random.Range(0, cards.Count)].GetComponent<Card>();
         putToDiscard(firstCard.GetComponent<NetworkObject>());
-        TurnManager.Instance.moveTurn();
+        TurnManager.Instance.calculateTurn();
     }
 
 

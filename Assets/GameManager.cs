@@ -18,7 +18,6 @@ public class GameManager : NetworkBehaviour
     public int readyForDeal = 0;
 
 
-
     private void Awake()
     {
         if (Instance != null && Instance != this)

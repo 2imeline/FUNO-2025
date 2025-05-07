@@ -7,6 +7,7 @@ using System.Linq;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System.Runtime.InteropServices.WindowsRuntime;
+using UnityEngine.Rendering.Universal;
 
 
 public class Player : NetworkBehaviour
@@ -153,7 +154,7 @@ bool imReady = false;
     {
         centerCards(hand.Last().GetComponent<NetworkObject>(), false);
         if(!canIPlay(hand.Last().GetComponent<Card>()))
-            TurnManager.Instance.moveTurn();
+            TurnManager.Instance.calculateTurn();
     }
 
 
@@ -182,9 +183,11 @@ bool imReady = false;
         }
     }
 
+    //NOTE: remove ability to play any card if last is wild
+    //remove when change colors is added
     public bool canIPlay(Card cardToPlay)
     {
-        if((cardToPlay.myNumber == DeckManager.Instance.lastPlayedCard.myNumber || cardToPlay.myColor == DeckManager.Instance.lastPlayedCard.myColor))
+        if((cardToPlay.myNumber == DeckManager.Instance.lastPlayedCard.myNumber || cardToPlay.myColor == DeckManager.Instance.lastPlayedCard.myColor || cardToPlay.wild || DeckManager.Instance.lastPlayedCard.wild))
             return true;
         return false;
     }
@@ -198,10 +201,25 @@ bool imReady = false;
         {
             centerCards(cardToPlay);
             playCard(cardToPlay);
-            TurnManager.Instance.moveTurn();
+            switch (card.myNumber)
+            {
+                case 10:
+                    helper.Instance.logToEveryone("Skip played");
+                    TurnManager.Instance.calculateTurn(2);
+                    break;
+                case 11:
+                    helper.Instance.logToEveryone("Reverse played");
+                    TurnManager.Instance.calculateTurn(1, true);
+                    break;
+                default:
+                    TurnManager.Instance.calculateTurn();
+                    break;
+            }
         }
 
     }
+
+
     [ObserversRpc]
     void playCard(NetworkObject cardToPlay)
     {

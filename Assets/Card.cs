@@ -11,6 +11,8 @@ public class Card : NetworkBehaviour
     public int myNumber;
     public Color myColor;
     public Outline myOutline;
+    public bool special = false;
+    public bool wild = false;
 
     private void Start()
     {

@@ -20,23 +20,40 @@ public class TurnManager : NetworkBehaviour
         Instance = this;
     }
 
-
-    [ObserversRpc]
-    public void moveTurn()
+    [Server]
+    public void calculateTurn(int timesToMove = 1, bool reverse = false)
     {
         List<Player> _players = PlayerManager.Instance.players;
-        turnIndex++;
-        if(turnIndex > (_players.Count-1))
-            turnIndex = 0;
-        foreach (Player player in _players)
+        if(reverse)
+        {
+            int newIndex = (_players.Count-1) - turnIndex;
+            _players.Reverse();
+            turnIndex = newIndex;
+        }
+        for (int i = 0; i < timesToMove; i++)
+        {
+            turnIndex++;
+            if(turnIndex > (_players.Count-1))
+                turnIndex = 0;
+        }
+        setTurnIndex(turnIndex, _players[turnIndex].GetComponent<NetworkObject>());
+    }
+
+    [ObserversRpc]
+    public void setTurnIndex(int newIndex, NetworkObject selectedPlayer)
+    {
+        foreach (Player player in PlayerManager.Instance.players)
         {
             player.myTurn = false;
             if(player.myTurnIndicator != null)
                 player.myTurnIndicator.SetActive(false);
         }
-        _players[turnIndex].myTurnIndicator.SetActive(true);
-        _players[turnIndex].myTurn = true;
-        currentGuysName = _players[turnIndex].nameCanvas.text;
+        Player _selectedPlayer = selectedPlayer.GetComponent<Player>();
+        _selectedPlayer.myTurnIndicator.SetActive(true);
+        _selectedPlayer.myTurn = true;
+        currentGuysName = _selectedPlayer.nameCanvas.text;
+        turnIndex = newIndex;
+        Debug.Log($"turn index is {turnIndex}");
 
     }
 }

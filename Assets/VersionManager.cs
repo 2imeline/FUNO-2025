@@ -10,6 +10,8 @@ public class VersionManager : MonoBehaviour
     [SerializeField] private string currentVersion = "0.1.5"; // format: major.minor.patch (0–99)
     [Tooltip("Maximum version if all features completed")]
     [SerializeField] private string nextVersion = "0.2.0";    // format: major.minor.patch (0–99)
+    [Tooltip("Optional version tag to display (e.g. T1, dev)")]
+    [SerializeField] private string versionTag = "";           // e.g. "T1", "dev"
 
     [Header("Features Checklist")]
     [Tooltip("Ticked features count towards version progress")]
@@ -36,8 +38,11 @@ public class VersionManager : MonoBehaviour
         int stepSize = Mathf.CeilToInt(versionRange / (float)total);
 
         int newUnits = Mathf.Clamp(curUnits + completed * stepSize, curUnits, nextUnits);
-
         string formatted = FormatVersion(newUnits);
+
+        // Append version tag if provided
+        if (!string.IsNullOrWhiteSpace(versionTag))
+            formatted += $"-{versionTag}";
 
         if (formatted != lastDisplay)
         {
