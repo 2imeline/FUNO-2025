@@ -95,7 +95,7 @@ bool imReady = false;
         RaycastHit hit;
         if(Physics.Raycast(cameraLogic.cameraTransform.position, cameraLogic.cameraTransform.forward, out hit, 5))
         {
-            if(hit.transform.CompareTag("Card") && cardsLevitating)
+            if(hit.transform.IsChildOf(cardHolder) && cardsLevitating)
             {
                 if(hit.transform != lastLookedCard && lastLookedCard != null)
                 {

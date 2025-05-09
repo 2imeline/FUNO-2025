@@ -895,7 +895,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: v0.2.39-WT2
+  m_text: v0.2.48
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1560,8 +1560,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentVersion: 0.2.00
   nextVersion: 0.3.00
-  versionTag: WT2
-  features: 0101010000000000
+  versionTag: 
+  features: 010101010000000000
   versionText: {fileID: 793151834}
 --- !u!1 &985751129
 GameObject:
