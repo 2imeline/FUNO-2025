@@ -21,6 +21,12 @@ public class VersionManager : MonoBehaviour
     [Tooltip("Displays computed version")]
     [SerializeField] private TextMeshProUGUI versionText;
 
+    private void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+
+    }
+
     private string lastDisplay = "";
 
     private void Update() => Refresh();

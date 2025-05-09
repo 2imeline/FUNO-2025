@@ -19,24 +19,24 @@ public class TurnManager : NetworkBehaviour
         }
         Instance = this;
     }
+    
 
     [Server]
     public void calculateTurn(int timesToMove = 1, bool reverse = false)
     {
-        List<Player> _players = PlayerManager.Instance.players;
         if(reverse)
         {
-            int newIndex = (_players.Count-1) - turnIndex;
-            _players.Reverse();
+            int newIndex = (PlayerManager.Instance.players.Count-1) - turnIndex;
+            PlayerManager.Instance.players.Reverse();
             turnIndex = newIndex;
         }
         for (int i = 0; i < timesToMove; i++)
         {
             turnIndex++;
-            if(turnIndex > (_players.Count-1))
+            if(turnIndex > (PlayerManager.Instance.players.Count-1))
                 turnIndex = 0;
         }
-        setTurnIndex(turnIndex, _players[turnIndex].GetComponent<NetworkObject>());
+        setTurnIndex(turnIndex, PlayerManager.Instance.players[turnIndex].GetComponent<NetworkObject>());
     }
 
     [ObserversRpc]

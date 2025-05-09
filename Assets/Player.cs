@@ -8,6 +8,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine.Rendering.Universal;
+using UnityEditor;
 
 
 public class Player : NetworkBehaviour
@@ -95,7 +96,7 @@ bool imReady = false;
         RaycastHit hit;
         if(Physics.Raycast(cameraLogic.cameraTransform.position, cameraLogic.cameraTransform.forward, out hit, 5))
         {
-            if(hit.transform.IsChildOf(cardHolder) && cardsLevitating)
+            if(hit.transform.CompareTag("Card") && cardsLevitating)
             {
                 if(hit.transform != lastLookedCard && lastLookedCard != null)
                 {
@@ -210,6 +211,15 @@ bool imReady = false;
                 case 11:
                     helper.Instance.logToEveryone("Reverse played");
                     TurnManager.Instance.calculateTurn(1, true);
+                    break;
+                case 12:
+                    helper.Instance.logToEveryone("+2 Played");
+                    int nextTi = TurnManager.Instance.turnIndex;
+                    nextTi++;
+                    if(nextTi > (PlayerManager.Instance.players.Count-1))
+                        nextTi = 0;
+                    DeckManager.Instance.drawCard(PlayerManager.Instance.players[nextTi].GetComponent<NetworkObject>());
+                    TurnManager.Instance.calculateTurn(1);
                     break;
                 default:
                     TurnManager.Instance.calculateTurn();
