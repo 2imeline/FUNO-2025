@@ -211,12 +211,33 @@ bool imReady = false;
                     helper.Instance.logToEveryone("Reverse played");
                     TurnManager.Instance.calculateTurn(1, true);
                     break;
+                case 12:
+                    helper.Instance.logToEveryone("+2 played");
+                    StartCoroutine(runPlusOperations(TurnManager.Instance.turnIndex));
+                    TurnManager.Instance.calculateTurn(1);
+                    break;
                 default:
                     TurnManager.Instance.calculateTurn();
                     break;
             }
         }
 
+    }
+
+    [Server]
+    public IEnumerator runPlusOperations(int curTi, int hM = 2)
+    {
+        yield return new WaitForSeconds(0.2f);
+        helper.Instance.logToEveryone("hi");
+        int tI = curTi;
+        tI++;
+            if(tI > (PlayerManager.Instance.players.Count-1))
+                tI = 0;
+        for (int i = 0; i < hM; i++)
+        {
+            DeckManager.Instance.drawCard(PlayerManager.Instance.players[tI].GetComponent<NetworkObject>());
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
 

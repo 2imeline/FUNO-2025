@@ -26,6 +26,11 @@ public class VersionManager : MonoBehaviour
     private void Update() => Refresh();
     private void OnValidate() => Refresh();
 
+    private void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     private void Refresh()
     {
         if (!TryParseVersion(currentVersion, out int curUnits)) return;
