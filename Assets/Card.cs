@@ -14,9 +14,11 @@ public class Card : NetworkBehaviour
     public bool special = false;
     public bool wild = false;
 
-    private void Start()
+    [ObserversRpc]
+    public void changeMyColor(int suit)
     {
-        
+        GetComponentInChildren<MeshRenderer>().material.color = DeckManager.Instance.suitColorList[suit];
+        myColor = DeckManager.Instance.suitColorList[suit];
     }
 
 

@@ -19,6 +19,7 @@ public TextMeshProUGUI nameCanvas;
 public Transform cardHolder;
 public GameObject myTurnIndicator;
 LookAround cameraLogic;
+public GameObject colorSelector;
 #endregion
 
 #region Player Identity & State
@@ -82,6 +83,30 @@ bool imReady = false;
 
     void Update()
     {
+        if(colorSelector.activeInHierarchy)
+        {
+            if(Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                wildLogic(1);
+                colorSelector.SetActive(false);
+            }
+            if(Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                wildLogic(2);
+                colorSelector.SetActive(false);
+            }
+            if(Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                wildLogic(3);
+                colorSelector.SetActive(false);
+            }
+            if(Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                wildLogic(4);
+                colorSelector.SetActive(false);
+            }
+        }
+
         if(Input.GetKeyDown(KeyCode.R) && !imReady)
             GameManager.Instance.notifyReadiness();
 
@@ -187,7 +212,7 @@ bool imReady = false;
     //remove when change colors is added
     public bool canIPlay(Card cardToPlay)
     {
-        if((cardToPlay.myNumber == DeckManager.Instance.lastPlayedCard.myNumber || cardToPlay.myColor == DeckManager.Instance.lastPlayedCard.myColor || cardToPlay.wild || DeckManager.Instance.lastPlayedCard.wild))
+        if((cardToPlay.myNumber == DeckManager.Instance.lastPlayedCard.myNumber || cardToPlay.myColor == DeckManager.Instance.lastPlayedCard.myColor || cardToPlay.wild))
             return true;
         return false;
     }
@@ -216,12 +241,24 @@ bool imReady = false;
                     StartCoroutine(runPlusOperations(TurnManager.Instance.turnIndex));
                     TurnManager.Instance.calculateTurn(1);
                     break;
+                case 13:
+                    helper.Instance.logToEveryone("WILD played");
+                    colorSelector.SetActive(true);
+                    break;
                 default:
                     TurnManager.Instance.calculateTurn();
                     break;
             }
         }
 
+    }
+
+    [ServerRpc]
+    public void wildLogic(int colorSelected)
+    {
+        int trueColorIndex = colorSelected-1;
+        DeckManager.Instance.lastPlayedCard.changeMyColor(trueColorIndex);
+        TurnManager.Instance.calculateTurn();
     }
 
     [Server]
