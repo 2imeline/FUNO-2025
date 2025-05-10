@@ -245,6 +245,12 @@ bool imReady = false;
                     helper.Instance.logToEveryone("WILD played");
                     colorSelector.SetActive(true);
                     break;
+                case 14:
+                    helper.Instance.logToEveryone("WILD +4 played");
+                    StartCoroutine(runPlusOperations(TurnManager.Instance.turnIndex, 4));
+                    colorSelector.SetActive(true);
+                    break;
+
                 default:
                     TurnManager.Instance.calculateTurn();
                     break;
